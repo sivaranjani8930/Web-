@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Travel Budget Calculator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+    <style>
+       
+        body {
+            background-image: url(img/background1.webp);
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-size:cover;
+            width: auto;
+            height: auto;
+            border-color:rgb(191, 104, 133) ;
+
+        }
+        #calculator{
+        
+            background:rgba(0,0,0,0.2);
+           
+            border-radius: 0.5rem;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-size:cover;
+            width: auto;
+            height: auto;
+            border-color:rgb(191, 104, 133) ;
+        }
+       
+        
+        label{
+           font-size:x-large;
+           font-family: 'Times New Roman', Times, serif;
+        }
+        input{
+            height: 30px;
+        }
+            
+    </style>
+<body class="bg-gray-200">
+    <div id="login" class="h-screen flex items-center justify-center">
+        <div class="bg-white/20 backdrop-blur-md p-8 rounded-lg shadow-lg w-96 text-center ">
+            <h1 class="text-3xl font-family 'Times New Roman', Times, serif font-bold mb-4">Welcome</h1>
+            <p class="text-gray-600 mb-6">Login to access the Travel Budget Calculator</p>
+            <input type="text" id="username" placeholder="Username" class="border border-gray-300 rounded-md px-4 py-2 w-full mb-4 " >
+            <input type="password" id="password" placeholder="Password" class="border border-gray-300 rounded-md px-4 py-2 w-full mb-4">
+            <button onclick="login()" class="bg-blue-500 text-white font-family 'Times New Roman' py-2 px-4 rounded-md w-full border-2 ">Login</button>
+       
+        </div>
+    </div>
+
+    <div id="calculator" class="hidden container mx-auto max-w-lg mt-8 p-6 bg-white rounded-lg shadow-lg border-2 ">
+        <h1 class="text-3xl font-bold text-center mb-4">Travel Budget Calculator</h1>
+
+        <label>Total Budget (INR):</label>
+        <input type="number" id="budget" class="border border-gray-300 rounded-md px-4 py-2 w-full mb-4">
+
+        <label>Duration (days):</label>
+        <input type="number" id="duration" class="border border-gray-300 rounded-md px-4 py-2 w-full mb-4">
+
+        <label>Room Cost per Night (INR):</label>
+        <input type="number" id="room" class="border border-gray-300 rounded-md px-4 py-2 w-full mb-4">
+
+        <label>Food Cost per Day (INR):</label>
+        <input type="number" id="food" class="border border-gray-300 rounded-md px-4 py-2 w-full mb-4">
+
+        <label>Snacks Cost per Day (INR):</label>
+        <input type="number" id="snacks" class="border border-gray-300 rounded-md px-4 py-2 w-full mb-4">
+
+        <label>Number of Travelers:</label>
+        <input type="number" id="people" class="border border-gray-300 rounded-md px-4 py-2 w-full mb-4">
+
+        <label>other expenses:</label>
+        <input type="number" id="other" class="border border-gray-300 rounded-md px-4 py-2 w-full mb-4">
+
+        <label>Transport Mode:</label>
+        <select id="transportMode" class="border border-gray-300 rounded-md px-4 py-2 w-full mb-4" onchange="toggleTransportFields()">
+            <option value="car">Car</option>
+            <option value="bus">Bus</option>
+            <option value="train">Train</option>
+            <option value="flight">Flight</option>
+        </select>
+
+        <div id="carFields">
+            <label>Distance to Travel (km):</label>
+            <input type="number" id="distance" class="border border-gray-300 rounded-md px-4 py-2 w-full mb-4">
+
+            <label>Fuel Efficiency (km/L):</label>
+            <input type="number" id="efficiency" class="border border-gray-300 rounded-md px-4 py-2 w-full mb-4">
+
+            <label>Fuel Price per Liter (INR):</label>
+            <input type="number" id="fuelPrice" class="border border-gray-300 rounded-md px-4 py-2 w-full mb-4">
+        </div>
+
+        <div id="otherTransportField" class="hidden">
+            <label>Transport Cost per Person (INR):</label>
+            <input type="number" id="transportCost" class="border border-gray-300 rounded-md px-4 py-2 w-full mb-4">
+        </div>
+
+        <button class="bg-blue-500 text-white py-2 px-4 rounded-md w-full mb-4" onclick="calculate()">Calculate</button>
+        <button class="bg-green-500 text-white py-2 px-4 rounded-md w-full mb-4" onclick="downloadReport()">Download Report</button>
+
+        <div id="result" class="text-center text-xl font-semibold"></div>
+    </div>
+
+    <script>
+        function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            if (username && password) {
+                document.querySelector('div.h-screen').classList.add('hidden');
+                document.getElementById('calculator').classList.remove('hidden');
+                
+            } else {
+                alert('Please enter a valid username and password.');
+            }
+        }
+
+        function toggleTransportFields() {
+            const mode = document.getElementById('transportMode').value;
+            document.getElementById('carFields').classList.toggle('hidden', mode !== 'car');
+            document.getElementById('otherTransportField').classList.toggle('hidden', mode === 'car');
+        }
+
+        function calculate() {
+            const budget = parseFloat(document.getElementById('budget').value);
+            const duration = parseInt(document.getElementById('duration').value);
+            const roomCost = parseFloat(document.getElementById('room').value);
+            const foodCost = parseFloat(document.getElementById('food').value);
+            const snacksCost = parseFloat(document.getElementById('snacks').value);
+            const people = parseInt(document.getElementById('people').value);
+            const other = parseInt(document.getElementById('other').value);
+            const transportMode = document.getElementById('transportMode').value;
+            
+            let totalTransportCost = 0;
+            if (transportMode === 'car') {
+                const distance = parseFloat(document.getElementById('distance').value);
+                const efficiency = parseFloat(document.getElementById('efficiency').value);
+                const fuelPrice = parseFloat(document.getElementById('fuelPrice').value);
+                totalTransportCost = (distance / efficiency) * fuelPrice;
+            } else {
+                const transportCost = parseFloat(document.getElementById('transportCost').value);
+                totalTransportCost = transportCost * people;
+            }
+
+            const totalRoomCost = roomCost * duration;
+            const totalFoodCost = foodCost * duration * people;
+            const totalSnacksCost = snacksCost * duration * people;
+            const totalExpenses = totalRoomCost + totalFoodCost + totalSnacksCost + totalTransportCost + other;
+            const remainingBudget = budget - totalExpenses;
+            const perPersonBudget = remainingBudget / people;
+            const travelCostPerPerson = totalExpenses / people;
+
+            document.getElementById('result').innerHTML = `
+                <p>Total Expenses: ₹${totalExpenses.toFixed(2)}</p>
+                <p>Remaining Budget: ₹${remainingBudget.toFixed(2)}</p>
+                <p>Balance Budget per Person: ₹${perPersonBudget.toFixed(2)}</p>
+                <p>Travel Cost per Person: ₹${travelCostPerPerson.toFixed(2)}</p>
+                <p>Total transport Cost: ₹${totalTransportCost.toFixed(2)}</p>`;
+
+            return {budget,duration,roomCost,foodCost,snacksCost,people,other,totalTransportCost, totalExpenses, remainingBudget, perPersonBudget, travelCostPerPerson, totalTransportCost };
+        }
+
+        function downloadReport() {
+            const result = calculate();
+            if (!result) return;
+            const date = new Date().toLocaleDateString();
+            const reportContent = `Travel Budget Report\n\n` +
+                `Date: ${date}\n\n` +
+                `Total Budget: ₹${result.budget.toFixed(2)}\n` +
+                `Trip Duration: ${result.duration} days\n` +
+                `Room Cost per Night: ₹${result.roomCost.toFixed(2)}\n` +
+                `Food Cost per Day: ₹${result.foodCost.toFixed(2)}\n` +
+                `Snacks Cost per Day: ₹${result.snacksCost.toFixed(2)}\n` +
+                `Number of Travelers: ${result.people}\n\n` +
+                `Total Transport Cost: ₹${result.totalTransportCost.toFixed(2)}\n` +
+                `Total Expenses: ₹${result.totalExpenses.toFixed(2)}\n` +
+                `Remaining Budget: ₹${result.remainingBudget.toFixed(2)}\n` +
+                `Balance Budget per Person: ₹${result.perPersonBudget.toFixed(2)}\n` +
+                `Travel Cost per Person: ₹${result.travelCostPerPerson.toFixed(2)}\n`;
+            const blob = new Blob([reportContent], { type: 'text/plain' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'Travel_Budget_Report.txt';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+    </script>
+</body>
+</html>
